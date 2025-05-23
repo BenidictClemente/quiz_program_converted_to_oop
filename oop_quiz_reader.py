@@ -28,3 +28,40 @@ class QuizGame:
             lines = block.strip().split("\n")
             if len(lines) < 6:
                 continue
+            question = lines[0][3:].strip() if lines[0].startswith("Q:") else lines[0].strip()
+            answers = {
+                'A': lines[1][2:].strip(),
+                'B': lines[2][2:].strip(),
+                'C': lines[3][2:].strip(),
+                'D': lines[4][2:].strip(),
+            }
+            correct_line = lines[5]
+            if "Correct answer:" in correct_line:
+                correct_answer = correct_line.split(":")[1].strip().upper()
+                self.questions.append(QuizQuestion(question, answers, correct_answer))
+
+    def start(self):
+        if not self.questions:
+            print("No questions available.")
+            return
+
+        selected_questions = random.sample(self.questions, min(self.max_questions, len(self.questions)))
+        score = 0
+
+        for i, question in enumerate(selected_questions, 1):
+            question.display(i)
+            user_answer = input("Your answer (A/B/C/D): ").strip().upper()
+            if question.is_correct(user_answer):
+                print("Correct!")
+                score += 1
+            else:
+                print(f"Wrong. Correct answer is: {question.correct_answer}")
+
+        print(f"\nFinal score: {score}/{len(selected_questions)}")
+
+
+# Run the game
+if __name__ == "__main__":
+    game = QuizGame()
+    game.load_questions()
+    game.start()
